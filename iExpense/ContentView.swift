@@ -2,15 +2,51 @@
 //  ContentView.swift
 //  iExpense
 //
-//  Created by Admin on 02/08/22.
+//  Created by Saurabh Jamadagni on 02/08/22.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showingAddView = false
+    
+    @StateObject var expenses = Expenses()
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            List {
+                ForEach(expenses.items) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        
+                        Spacer()
+                        
+                        Text(item.amount, format: .currency(code: "USD"))
+                    }
+                }
+                .onDelete(perform: removeItems)
+            }
+            .navigationTitle("iExpense")
+            .toolbar {
+                Button {
+                    showingAddView = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+            .sheet(isPresented: $showingAddView) {
+                AddView(expenses: expenses)
+            }
+        }
+        
+    }
+    
+    func removeItems(at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
     }
 }
 
